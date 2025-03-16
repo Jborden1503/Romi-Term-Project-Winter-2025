@@ -77,6 +77,41 @@ There are **12 states** in the motor task. The transitions are determined by the
 
 The initialization is handled with a `motor_init` global variable that ensures initialization functions only run once. A more Pythonic implementation would be to handle this within a class constructor.
 
+# Motor Task Documentation
+
+The Motor Task is responsible for the actuation and control of both of Romi’s motors. It receives a base speed parameter, a gain compensator object for battery voltage correction, two motor objects instantiated from the `Motordriver` class, and seven PID controllers corresponding to various setpoints along the course. Instead of interfacing directly with sensors, the Motor Task relies on sensor data shared by a separate Sensor Task. This shared data includes the IR sensor centroid value for line following, the heading value from the IMU, and a checkpoint signal that communicates state transitions. When the checkpoint share indicates a value of 1, it signifies that a checkpoint has been reached. The Motor Task then resets this share to 0 and updates its internal state variable (motor_state) to proceed to the next state.
+
+Initialization of the Motor Task occurs within a run-once section at the beginning of the main generator function. This section checks for a global variable named `motor_init` (which the main function sets to `True`) and performs all necessary initialization routines. After the initialization is complete, the variable is set to `False` so that the initialization code does not run again. A more Pythonic approach would be to encapsulate the Motor Task within a class, allowing automatic initialization when an object is instantiated.
+
+The task is implemented as a state machine with twelve distinct states, and transitions between states are determined solely by the checkpoint signal provided by the Sensor Task.
+
+**STATE_1:**  Romi performs line following along the course until it reaches checkpoint #4. In this state, a PID controller processes the centroid value from the IR sensor and computes an actuation value. The computed output is used to adjust the base duty cycle: the left motor receives a command that is the base speed decreased by the corrected PID output, while the right motor receives a command that is the base speed increased by the same corrected value. When the checkpoint share is set to `1`, the system transitions to `STATE_2`.
+
+**STATE_2:** Romi is required to stop and turn in place at checkpoint #4. At the start of this state, both motor efforts are set to zero. A heading PID controller then takes the heading value from the heading share, computes an actuation value, and this value is adjusted for battery charge by the compensator. The left motor is driven with the negative of this corrected output, while the right motor receives the raw corrected output. A checkpoint signal of `1` prompts a transition to `STATE_3`.
+
+**STATE_3:** Romi follows its heading until it reaches the end of the grid. Here, the PID controller uses the heading value to compute an actuation value, and similar to STATE_1, the base duty cycle is modified accordingly: the left motor is given the base speed minus the PID output (after compensation) and the right motor the base speed plus the PID output. When the checkpoint share indicates that a checkpoint has been reached, the task transitions to `STATE_4`.
+
+**STATE_4:** Romi stops and turns in place at the end of the grid. The motors are first set to zero, and then a PID controller processes the heading value to determine an actuation output. After compensation, the left motor is commanded with the negative of the PID output while the right motor receives the unaltered PID output. A checkpoint signal then triggers the transition to `STATE_5`.
+
+**STATE_5:** Romi resumes line following similar to STATE_1, where the robot continues to follow the line until it detects the presence of a wall. Once the Sensor Task signals the wall detection by setting the checkpoint share to `1`, the Motor Task transitions to `STATE_6`.
+
+**STATE_6:** Romi stops and turns in place at the wall. The state begins with both motor efforts set to zero, and a PID controller processes the heading value to compute an actuation value, which is then corrected for battery voltage. The left motor receives the negative of this value, and the right motor receives the raw value. Upon receiving the next checkpoint signal, the task advances to `STATE_7`.
+
+**STATE_7:** Romi performs heading following to avoid the wall. The PID controller processes the heading value to produce an actuation value, and the adjusted base speed is applied to the motors: the left motor gets the base speed decreased by the corrected PID output, and the right motor receives the base speed increased by the same amount. 
+
+**STATE_8:** Romi stops and turns in place past the wall. Similar to previous stop-and-turn states, both motors are set to zero initially; then a PID controller computes an actuation value based on the heading data, the compensator adjusts this value for battery voltage, and the left motor is driven with the negative of the corrected output while the right motor receives the raw output. A checkpoint signal moves the task to `STATE_9`.
+
+**STATE_9:** Romi performs heading following to rejoin the line. The PID controller processes the heading value, and the motors are commanded with the base speed modified by the compensated PID output: the left motor receives the base speed minus the PID output and the right motor receives the base speed plus the PID output. The state transitions to `STATE_10` when a checkpoint signal is received.
+
+In **STATE_10:** Romi stops and turns in place while on the line. Both motor efforts are initially set to zero, and a PID controller uses the heading value to compute an actuation output. After battery compensation, the left motor is commanded with the negative of the PID output and the right motor with the raw output. A checkpoint signal then causes a transition to `STATE_11`.
+
+**STATE_11:** Romi resumes line following until it reaches the end of the course. This state is essentially identical to STATE_1. Once the Sensor Task indicates that the course is complete by setting the checkpoint share to `1`, the Motor Task transitions to the final state, `STATE_12`.
+
+**STATE_12:** Both motors are commanded to stop completely, bringing the robot to a full halt.
+
+Throughout all these states, the actuation commands are computed using the appropriate PID controller and are then adjusted for battery voltage using the compensator. The final motor commands are applied through the `set_effort()` method of the `Motordriver` class. This framework provides a robust control mechanism for navigating the robot through its course, with state transitions managed externally by the Sensor Task via the checkpoint share.
+
+
 
 <a id="classes"></a>
 #### Classes
