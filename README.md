@@ -1,5 +1,5 @@
 <a id="romi-design"></a>
-# Romi Design
+# Romi 
 ### Winter 2025
 Project by Jake Borden and Ashford Connor 
 
