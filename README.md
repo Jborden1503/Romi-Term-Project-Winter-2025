@@ -45,10 +45,10 @@ Details on the cooperative tasks, state machines, and scheduling.
   Implements feedback control to regulate system performance, reducing errors between measured values and setpoints. The update() method computes proportional, integral, and derivative terms over time to generate an output that effectively corrects system behavior.
 
 * **Gain_compensator:**
-  Adjusts motor control outputs based on real-time battery voltage readings to maintain consistent performance. By measuring battery voltage with an ADC pin, it uses correct_value() to scale the motor effort, compensating for voltage fluctuations that could affect motor behavior.
+  Adjusts motor control outputs based on real-time battery voltage readings to maintain consistent performance. By measuring battery voltage with an ADC pin, it uses correct_value() to scale the motor effort, compensating for the loss of charge that will affect motor performace. This became necssarey to avoid needing to tune the controller gains continuosly as the battery level changed. The change in battery level changes the voltage to the motors, meaning more agressive gains were needed as the battery level dropped. 
 
 * **IMU:**
-  Handles communication with the Bosch BNO055 IMU sensor via the I²C protocol, offering orientation data through Euler angles. Methods such as get_heading(), get_roll(), and get_pitch() parse raw IMU data into meaningful orientation angles. It includes capabilities for sensor calibration, mode configuration, and normalization of angle measurements to handle continuous rotations.
+  Handles communication with the Bosch BNO055 IMU sensor via the I²C protocol, offering orientation data through Euler angles. Methods such as get_heading(), get_roll(), and get_pitch() parse raw IMU data into meaningful orientation angles. It includes capabilities for sensor calibration, mode configuration, and normalization of angle measurements to handle continuous rotations. The class takes a single I2C controller object as an input. The I2C controller is an object of the pyb.I2C class built into MicroPython. 
 
 * **Bumpsensor:**
   Detects physical collisions using an array of bump-switch inputs configured with internal pull-up resistors. The get_state() method returns a boolean status indicating whether any of the sensors have been triggered, enabling immediate collision response in the robot's control logic.
