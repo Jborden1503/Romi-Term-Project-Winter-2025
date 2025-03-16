@@ -16,7 +16,22 @@
 For its attempts to complete the course, Romi had the help of a number of sensors. First, an Adafruit BNO055 IMU was used to keep track of headings. This was connected to the Nucleo using I2C connection. Second, a pair of Pololu bump sensors were used for detecting the wall at the end of the course. Third, a Pololu analog IR reflectance sensor was used for line following. We purchased a sensor with a total of 13 channels, but only ended up using 7 of them for simplicity.
 <a id="bill-of-materials"></a>
 #### Bill of Materials
-A list of components used in the project.
+##### Table 1. BOM for Romi Project
+
+| Item No. | Description               | Supplier             | Supplier PN    |
+|---------|-----------------------|--------------------|----------------|
+| 1       | Romi Chassis kit (pink) | Pololu              | 3501          |
+| 2       | Encoder kit             | Pololu              | 3542          |
+| 3       | 8 x 13 analog IR sensor array | Pololu              | 4253          |
+| 4       | BN055 IMU and breakout board | Adafruit            | 2472          |
+| 5       | STM 32L476RG Nucleo      | ST Microelectronics | STM32L476RG   |
+| 6       | Shoe of Brian            | Cal Poly Mechanical Engineering | N/A           |
+| 7       | Dupont connectors        | Amazon              | N/A           |
+| 8       | 3.3k ohm resistors       | N/A                 | N/A           |
+| 9       | Perfboard                | N/A                 | N/A           |
+| 10      | 6 NiMh AA batteries      | Amazon              | N/A           |
+
+
 
 <a id="wiring-diagram"></a>
 #### Wiring Diagram
