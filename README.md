@@ -27,23 +27,51 @@ A diagram showing the wiring connections between components.
 Overview of how the software is organized and structured.
 
 <a id="tasks"></a>
-#### Tasks
-* **Sensor Task:**
-The sensor task is responsible for reading sensor values and keeping track of significant milestones on the course. This task is functionally similar to a mastermind task, but it differs chiefly by its direct interaction with external hardware. Given the simple nature of checking course progress, it was appropriate roll this function into the sensor task to improve memory consumption. The task takes an encoder object, and IR sensor object and an IMU object. It communicates with the motor task using 3 shares: The centroid share, the heading share and the checkpoint share. The centroid share is used to share the value of the centroid as computed in the sensor task. The sensor task will only put values into this share and does not need to get them out. The heading share is used to share the value of the heading as computed in the sensor task. This will be shared as a -179-0-180 degree value, while the sensor task itself uses the raw 360 degree reading to determine the robots true orientation. This is done because it is more useful to the PID controllers in the motor task.  The sensor task will only put values into this share and does not need to get them out. The checkpoint share is used as a flag to tell the motor task that it has reached the end of its current state. When the sensor task determines that the state is finished, using sensor data, a 1 is placed in the checkpoint share. The sensor task will only put a value of 1 into this share and does not read the value.
-There are 12 states in the sensor task. The transitions are determined using either encoder positions or heading angles. When the sensor value falls within the specified range, the state is considered finished, and the sensor task signals the transition using the checkpoint share and setting its own internal state variable to the next state. 
-The initialization of this task is done inside a run-once if statement above the while loop of the main generator function. This looks for a global variable called “sensor_init”, which the main function sets to True before starting the scheduler. Once init functions are complete, sensor_init is set to False so that the init functions will not run again. A more elegant and pythonic implementation of this code would be to implement the task as a class, where the init functions are performed automatically upon instantiation of a sensor task object. 
-STATE_1 is line following through the course until checkpoint #4. In this state the sensor task computes the centroid from the IR line sensor and sends it to the motor task via the centroid share. This state also keeps track of the encoder position looking for an encoder reading of 112 to 113 radians. Once this value is reached, the state zeroes the encoder, sets sensor_state to STATE_2 and puts a 1 in the checkpoint share. Radians were used for the distance in this state, as they proved to be the more consistent in testing than a setpoint in millimeters. A millimeter setpoint proved to be much less consistent for such a relatively long distance, whereas the radians setpoint yielded more consistent state transitions.  
-STATE_2 is a state for changing the heading of Romi at check point 4. The state reads the raw angle heading, tests it against the desired heading of 180 degrees (with respect to the starting angle), computes the bi-directional angle and puts it in the heading share. Once the raw angle falls within the desired range, the encoder will be zeroed, a 1 will be put in the checkpoint share and sensor_state is set to STATE_3. 
-STATE_3 is a state for heading following. This state is identical to the previous state, except that the transition point is an encoder distance rather than an angle. This state runs between checkpoint 4 and the turning point at the end of the grid. Once the distance to the end of the grid is read by the encoder the state will zero the encoder, put a 1 in the checkpoint share and sensor_state is set to STATE_4. 
-STATE_4 is identical to STATE_2, but with a different final setpoint. It is a turn in place state with the only output being the bi-directional heading. The final heading will be 90 degrees with respect to the starting angle. The state transition process is the same.
-STATE_5 is nearly identical to STATE_1, with the state output being the centroid for line following. The transition out of this state however is triggered by the bump sensor. Each pass through this state the bump sensors Booleans are checked to see if Romi has encountered the wall. If the one of the Booleans are True, then the standard state transition will occur as it has in the other states so far. 
-STATE_6 is identical to STATE_2, but with a different final setpoint. It is a turn in place state with the only output being the bi-directional heading. This state is used to turn in place in preparation to drive around the wall. The final heading will be 0 degrees with respect to the starting angle. The state transition process is the same.
-STATE_7 is identical to STATE_3, but with a different final setpoint. It is a heading following state with the only output being the bi-directional heading. The heading will be 0 degrees with respect to the starting angle. The state transition process is the same and will be triggered by reaching the desired encoder distance in mm.
-STATE_8 is identical to STATE_2, but with a different final setpoint. It is a turn in place state with the only output being the bi-directional heading. The final heading will be 90 degrees with respect to the starting angle. This state is used to turn in place towards the line. The state transition process is the same.
-STATE_9 is identical to STATE_3, but with a different final setpoint. It is a heading following state with the only output being the bi-directional heading. The heading will be 90 degrees with respect to the starting angle. The state transition process is the same and will be triggered by reaching the desired encoder distance in mm when Romi re-joins the line.
-STATE_10 is identical to STATE_2, but with a different final setpoint. It is a turn in place state with the only output being the bi-directional heading. The final heading will be 180 degrees with respect to the starting angle. This state is used to turn in place on the line. The state transition process is the same.
-STATE_11 is identical to STATE_1 but with a target encoder distance equal to the distance traverse to avoid the wall. This is the final state transition to the stop state, but it follows the same process.
-STATE_12 is the stop state. This state does nothing. 
+## Tasks
+
+### Sensor Task
+
+The sensor task is responsible for reading sensor values and keeping track of significant milestones on the course. This task is functionally similar to a mastermind task, but it differs chiefly by its direct interaction with external hardware. Given the simple nature of checking course progress, it was appropriate to roll this function into the sensor task to improve memory consumption.
+
+The task takes an encoder object, an IR sensor object, and an IMU object. It communicates with the motor task using three shares: the centroid share, the heading share, and the checkpoint share.
+
+- The **centroid share** is used to share the value of the centroid as computed in the sensor task. The sensor task will only put values into this share and does not need to get them out.
+- The **heading share** is used to share the value of the heading as computed in the sensor task. This will be shared as a -179-0-180 degree value, while the sensor task itself uses the raw 360-degree reading to determine the robot's true orientation. This is done because it is more useful to the PID controllers in the motor task. The sensor task will only put values into this share and does not need to get them out.
+- The **checkpoint share** is used as a flag to tell the motor task that it has reached the end of its current state. When the sensor task determines that the state is finished, using sensor data, a 1 is placed in the checkpoint share. The sensor task will only put a value of 1 into this share and does not read the value.
+
+There are **12 states** in the sensor task. The transitions are determined using either encoder positions or heading angles. When the sensor value falls within the specified range, the state is considered finished, and the sensor task signals the transition using the checkpoint share and setting its own internal state variable to the next state.
+
+The initialization of this task is done inside a run-once `if` statement above the while loop of the main generator function. This looks for a global variable called `sensor_init`, which the main function sets to `True` before starting the scheduler. Once init functions are complete, `sensor_init` is set to `False` so that the init functions will not run again. A more elegant and Pythonic implementation of this code would be to implement the task as a class, where the init functions are performed automatically upon instantiation of a sensor task object.
+
+#### State Descriptions
+
+- **STATE_1**: Line following through the course until checkpoint #4. The sensor task computes the centroid from the IR line sensor and sends it to the motor task via the centroid share. This state also keeps track of the encoder position looking for an encoder reading of 112 to 113 radians. Once this value is reached, the state zeroes the encoder, sets `sensor_state` to `STATE_2`, and puts a 1 in the checkpoint share. Radians were used for the distance in this state, as they proved to be more consistent in testing than a setpoint in millimeters.
+
+- **STATE_2**: Changing the heading of Romi at checkpoint #4. The state reads the raw angle heading, tests it against the desired heading of 180 degrees (with respect to the starting angle), computes the bi-directional angle, and puts it in the heading share. Once the raw angle falls within the desired range, the encoder will be zeroed, a 1 will be put in the checkpoint share, and `sensor_state` is set to `STATE_3`.
+
+- **STATE_3**: Heading following. This state is identical to the previous state, except that the transition point is an encoder distance rather than an angle. This state runs between checkpoint #4 and the turning point at the end of the grid. Once the distance to the end of the grid is read by the encoder, the state will zero the encoder, put a 1 in the checkpoint share, and `sensor_state` is set to `STATE_4`.
+
+- **STATE_4**: Identical to `STATE_2`, but with a different final setpoint. It is a turn-in-place state with the only output being the bi-directional heading. The final heading will be 90 degrees with respect to the starting angle. The state transition process is the same.
+
+- **STATE_5**: Nearly identical to `STATE_1`, with the state output being the centroid for line following. The transition out of this state, however, is triggered by the bump sensor. Each pass through this state, the bump sensors' Booleans are checked to see if Romi has encountered the wall. If one of the Booleans is `True`, then the standard state transition will occur as it has in the other states so far.
+
+- **STATE_6**: Identical to `STATE_2`, but with a different final setpoint. It is a turn-in-place state with the only output being the bi-directional heading. This state is used to turn in place in preparation to drive around the wall. The final heading will be 0 degrees with respect to the starting angle. The state transition process is the same.
+
+- **STATE_7**: Identical to `STATE_3`, but with a different final setpoint. It is a heading-following state with the only output being the bi-directional heading. The heading will be 0 degrees with respect to the starting angle. The state transition process is the same and will be triggered by reaching the desired encoder distance in millimeters.
+
+- **STATE_8**: Identical to `STATE_2`, but with a different final setpoint. It is a turn-in-place state with the only output being the bi-directional heading. The final heading will be 90 degrees with respect to the starting angle. This state is used to turn in place towards the line. The state transition process is the same.
+
+- **STATE_9**: Identical to `STATE_3`, but with a different final setpoint. It is a heading-following state with the only output being the bi-directional heading. The heading will be 90 degrees with respect to the starting angle. The state transition process is the same and will be triggered by reaching the desired encoder distance in millimeters when Romi re-joins the line.
+
+- **STATE_10**: Identical to `STATE_2`, but with a different final setpoint. It is a turn-in-place state with the only output being the bi-directional heading. The final heading will be 180 degrees with respect to the starting angle. This state is used to turn in place on the line. The state transition process is the same.
+
+- **STATE_11**: Identical to `STATE_1`, but with a target encoder distance equal to the distance traversed to avoid the wall. This is the final state transition to the stop state, but it follows the same process.
+
+- **STATE_12**: The stop state. This state does nothing.
+
+
+
+
   
 * **Motor Task:**
 Details on the cooperative tasks, state machines, and scheduling.
