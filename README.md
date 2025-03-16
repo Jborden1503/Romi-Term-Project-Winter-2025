@@ -51,7 +51,7 @@ Details on the cooperative tasks, state machines, and scheduling.
   Handles communication with the Bosch BNO055 IMU sensor via the I²C protocol, offering orientation data through Euler angles. Methods such as __get_heading()__, __get_roll()__, and __get_pitch()__ parse raw IMU data into meaningful orientation angles. It includes capabilities for sensor calibration, mode configuration, and normalization of angle measurements to handle continuous rotations. The class takes a single I2C controller object as an input. The I2C controller is an object of the pyb.I2C class built into MicroPython. 
 
 * **Bumpsensor:**
-  Detects physical collisions using an array of bump-switch inputs configured with internal pull-up resistors. The __get_state()__ method returns a boolean status indicating whether any of the sensors have been triggered, enabling immediate collision response in the robot's control logic.
+  Detects physical collisions using an array of bump-switch inputs configured with internal pull-up resistors. The __get_state()__ method returns a boolean status indicating whether any of the sensors have been triggered, enabling immediate collision response in the robot's control logic. An obejct of this class can accomodate an array of size n switches, allowing for multiple sensors in one object or a larger sensor to be used.
 
 <a id="conclusion"></a>
 ### Discussion
