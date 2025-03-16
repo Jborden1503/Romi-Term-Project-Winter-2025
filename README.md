@@ -31,7 +31,7 @@ Overview of how the software is organized and structured.
 
 ### Sensor Task
 
-The sensor task is responsible for reading sensor values and keeping track of significant milestones on the course. This task is functionally similar to a mastermind task, but it differs chiefly by its direct interaction with external hardware. Given the simple nature of checking course progress, it was appropriate to roll this function into the sensor task to improve memory consumption.
+The sensor task is responsible for reading sensor values and keeping track of significant milestones on the course. This task is functionally similar to a mastermind task, but it differs chiefly by its direct interaction with external hardware. Given the simple nature of checking course progress, it was appropriate to roll this function into the sensor task to improve memory consumption. This task is run with a priority of 2 and a period of 10 ms.
 
 The task takes an encoder object, an IR sensor object, and an IMU object. It communicates with the motor task using three shares: the centroid share, the heading share, and the checkpoint share.
 
@@ -69,12 +69,14 @@ The initialization of this task is done inside a run-once `if` statement above t
 
 - **STATE_12**: The stop state. This state does nothing.
 
+### Motor Task
 
+The motor task is responsible for the actuation and control of both of Romi’s motors. It takes a `base_speed`, compensator object, two motor objects, and seven PID controllers as inputs. Each PID controller corresponds to different setpoints around the course. The motor task computes the actuation duty cycle based on sensor data and sets the motor effort. State transitions are triggered by the checkpoint share. This task is run with a priority of 2 and a period of 10 ms. 
 
+There are **12 states** in the motor task. The transitions are determined by the sensor task and communicated via the checkpoint share. The motor task does not interface with any sensors directly and has no way of tracking progress through the state it is in.
 
-  
-* **Motor Task:**
-Details on the cooperative tasks, state machines, and scheduling.
+The initialization is handled with a `motor_init` global variable that ensures initialization functions only run once. A more Pythonic implementation would be to handle this within a class constructor.
+
 
 <a id="classes"></a>
 #### Classes
