@@ -1,4 +1,4 @@
-**Table of content:**
+**Table of contents:**
  - [Romi Design](#romi-design)
    - [Hardware Design](#hardware-design)
      - [Bill of Materials](#bill-of-materials)
