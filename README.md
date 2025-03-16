@@ -38,13 +38,13 @@ For its attempts to complete the course, Romi had the help of a number of sensor
 A diagram showing the wiring connections between components.
 
 <a id="program-design-and-structure"></a>
-### Program Design and Structure
-Overview of how the software is organized and structured.
+## Program Design and Structure
+
 
 <a id="tasks"></a>
-## Tasks
+### Tasks
 
-### Sensor Task
+#### Sensor Task
 
 The sensor task is responsible for reading sensor values and keeping track of significant milestones on the course. This task is functionally similar to a mastermind task, but it differs chiefly by its direct interaction with external hardware. Given the simple nature of checking course progress, it was appropriate to roll this function into the sensor task to improve memory consumption. This task is run with a priority of 2 and a period of 10 ms.
 
@@ -58,7 +58,7 @@ There are **12 states** in the sensor task. The transitions are determined using
 
 The initialization of this task is done inside a run-once `if` statement above the while loop of the main generator function. This looks for a global variable called `sensor_init`, which the main function sets to `True` before starting the scheduler. Once init functions are complete, `sensor_init` is set to `False` so that the init functions will not run again. A more elegant and Pythonic implementation of this code would be to implement the task as a class, where the init functions are performed automatically upon instantiation of a sensor task object.
 
-#### State Descriptions
+##### State Descriptions
 
 - **STATE_1**: Line following through the course until checkpoint #4. The sensor task computes the centroid from the IR line sensor and sends it to the motor task via the centroid share. This state also keeps track of the encoder position looking for an encoder reading of 112 to 113 radians. Once this value is reached, the state zeroes the encoder, sets `sensor_state` to `STATE_2`, and puts a 1 in the checkpoint share. Radians were used for the distance in this state, as they proved to be more consistent in testing than a setpoint in millimeters.
 
@@ -85,13 +85,16 @@ The initialization of this task is done inside a run-once `if` statement above t
 - **STATE_12**: The stop state. This state does nothing.
 
 
-### Motor Task 
+#### Motor Task 
 
 The Motor Task is responsible for the actuation and control of both of Romi’s motors. It receives a base speed parameter, a gain compensator object for battery voltage correction, two motor objects instantiated from the `Motordriver` class, and seven PID controllers corresponding to various setpoints along the course. Instead of interfacing directly with sensors, the Motor Task relies on sensor data shared by a separate Sensor Task. This shared data includes the IR sensor centroid value for line following, the heading value from the IMU, and a checkpoint signal that communicates state transitions. When the checkpoint share indicates a value of 1, it signifies that a checkpoint has been reached. The Motor Task then resets this share to 0 and updates its internal state variable (motor_state) to proceed to the next state.
 
 Initialization of the Motor Task occurs within a run-once section at the beginning of the main generator function. This section checks for a global variable named `motor_init` (which the main function sets to `True`) and performs all necessary initialization routines. After the initialization is complete, the variable is set to `False` so that the initialization code does not run again. A more Pythonic approach would be to encapsulate the Motor Task within a class, allowing automatic initialization when an object is instantiated.
 
 The task is implemented as a state machine with twelve distinct states, and transitions between states are determined solely by the checkpoint signal provided by the Sensor Task.
+
+##### State Descriptions
+
 
 **STATE_1:**  Romi performs line following along the course until it reaches checkpoint #4. In this state, a PID controller processes the centroid value from the IR sensor and computes an actuation value. The computed output is used to adjust the base duty cycle: the left motor receives a command that is the base speed decreased by the corrected PID output, while the right motor receives a command that is the base speed increased by the same corrected value. When the checkpoint share is set to `1`, the system transitions to `STATE_2`.
 
