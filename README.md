@@ -1,3 +1,8 @@
+<a id="romi-design"></a>
+# Romi Design
+### Winter 2025
+Project by Jake Borden and Ashford Connor 
+
 **Table of contents:**
  - [Romi Design](#romi-design)
    - [Hardware Design](#hardware-design)
@@ -9,8 +14,7 @@
  - [Discussion](#discussion)
  - [Video Demonstration](#video-demonstration)
 
-<a id="romi-design"></a>
-# Romi Design
+
 <a id="hardware-design"></a>
 ## Hardware Design
 For its attempts to complete the course, Romi had the help of a number of sensors. First, an Adafruit BNO055 IMU was used to keep track of headings. This was connected to the Nucleo using I2C connection. Second, a pair of Pololu bump sensors were used for detecting the wall at the end of the course. Third, a Pololu analog IR reflectance sensor was used for line following. We purchased a sensor with a total of 13 channels, but only ended up using 7 of them for simplicity.
