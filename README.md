@@ -10,12 +10,12 @@
  - [Video Demonstration](#video-demonstration)
 
 <a id="romi-design"></a>
-### Romi Design
+# Romi Design
 <a id="hardware-design"></a>
-### Hardware Design
+## Hardware Design
 For its attempts to complete the course, Romi had the help of a number of sensors. First, an Adafruit BNO055 IMU was used to keep track of headings. This was connected to the Nucleo using I2C connection. Second, a pair of Pololu bump sensors were used for detecting the wall at the end of the course. Third, a Pololu analog IR reflectance sensor was used for line following. We purchased a sensor with a total of 13 channels, but only ended up using 7 of them for simplicity.
 <a id="bill-of-materials"></a>
-#### Bill of Materials
+### Bill of Materials
 ##### Table 1. BOM for Romi Project
 
 | Item No. | Description               | Supplier             | Supplier PN    |
@@ -34,7 +34,7 @@ For its attempts to complete the course, Romi had the help of a number of sensor
 
 
 <a id="wiring-diagram"></a>
-#### Wiring Diagram
+### Wiring Diagram
 A diagram showing the wiring connections between components.
 
 <a id="program-design-and-structure"></a>
@@ -84,15 +84,8 @@ The initialization of this task is done inside a run-once `if` statement above t
 
 - **STATE_12**: The stop state. This state does nothing.
 
-### Motor Task
 
-The motor task is responsible for the actuation and control of both of Romi’s motors. It takes a `base_speed`, compensator object, two motor objects, and seven PID controllers as inputs. Each PID controller corresponds to different setpoints around the course. The motor task computes the actuation duty cycle based on sensor data and sets the motor effort. State transitions are triggered by the checkpoint share. This task is run with a priority of 2 and a period of 10 ms. 
-
-There are **12 states** in the motor task. The transitions are determined by the sensor task and communicated via the checkpoint share. The motor task does not interface with any sensors directly and has no way of tracking progress through the state it is in.
-
-The initialization is handled with a `motor_init` global variable that ensures initialization functions only run once. A more Pythonic implementation would be to handle this within a class constructor.
-
-# Motor Task Documentation
+### Motor Task 
 
 The Motor Task is responsible for the actuation and control of both of Romi’s motors. It receives a base speed parameter, a gain compensator object for battery voltage correction, two motor objects instantiated from the `Motordriver` class, and seven PID controllers corresponding to various setpoints along the course. Instead of interfacing directly with sensors, the Motor Task relies on sensor data shared by a separate Sensor Task. This shared data includes the IR sensor centroid value for line following, the heading value from the IMU, and a checkpoint signal that communicates state transitions. When the checkpoint share indicates a value of 1, it signifies that a checkpoint has been reached. The Motor Task then resets this share to 0 and updates its internal state variable (motor_state) to proceed to the next state.
 
@@ -129,7 +122,7 @@ Throughout all these states, the actuation commands are computed using the appro
 
 
 <a id="classes"></a>
-#### Classes
+### Classes
 * **Encoder:**
   Interfaces with quadrature encoder hardware to track positional changes using timer channels. It maintains internal counters, updating them through the update() method, which handles position increments, decrements, and overflow scenarios. The encoder’s position is accessed via the get_position() method, and can be reset using __zero()__.
 
