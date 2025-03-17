@@ -22,7 +22,7 @@ The Romi robot is based on the ‘Romi’ chassis and motor kit from Pololu robo
 
 The robot was tasked with completed the course shown below in Figure 3. There were several different approaches used to complete this course. What follows is our approach to solving this problem, complete with our successes, failures, insights and future steps for improving our Romi. 
 
-![Romi!](IMG_6859.jpg "Romi")
+![Romi!](IMG_6859.JPG "Romi")
 ###### Figure 1. Assembled Romi.
 
 <a id="hardware-design"></a>
