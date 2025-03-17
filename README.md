@@ -83,7 +83,7 @@ There are **12 states** in the sensor task. The transitions are determined using
 The initialization of this task is done inside a run-once `if` statement above the while loop of the main generator function. This looks for a global variable called `sensor_init`, which the main function sets to `True` before starting the scheduler. Once init functions are complete, `sensor_init` is set to `False` so that the init functions will not run again. A more elegant and Pythonic implementation of this code would be to implement the task as a class, where the init functions are performed automatically upon instantiation of a sensor task object.
 
 ##### State Descriptions
-![Sensor States!](Sensor_FSM.JPG "Sensor Fsm")
+![Sensor States!](Sensor_FSM.jpg "Sensor Fsm")
 ###### Figure 5. Sensor FSM.
 - **STATE_1**: Line following through the course until checkpoint #4. The sensor task computes the centroid from the IR line sensor and sends it to the motor task via the centroid share. 
 
@@ -120,7 +120,7 @@ The task is implemented as a state machine with twelve distinct states, and tran
 
 ##### State Descriptions
 
-![Motor States!](Motor_FSM.JPG "Motor Fsm")
+![Motor States!](Motor_FSM.jpg "Motor Fsm")
 ###### Figure 6. Motor FSM.
 **STATE_1:**  Romi performs line following along the course until it reaches checkpoint #4. In this state, a PID controller processes the centroid value from the IR sensor and computes an actuation value. The computed output is used to adjust the base duty cycle: the left motor receives a command that is the base speed decreased by the corrected PID output, while the right motor receives a command that is the base speed increased by the same corrected value. When the checkpoint share is set to `1`, the system transitions to `STATE_2`.
 
