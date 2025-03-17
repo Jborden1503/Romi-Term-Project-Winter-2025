@@ -64,6 +64,7 @@ A diagram showing the wiring connections between components.
 
 <a id="tasks"></a>
 ### Tasks
+![ Taskdia!](Untitled_drawing.jpg "Tasking diagram")
 
 #### Sensor Task
 
