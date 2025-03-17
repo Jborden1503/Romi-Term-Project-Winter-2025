@@ -174,5 +174,6 @@ Summary of the project outcomes and lessons learned.
 
 <a id="video-demonstration"></a>
 ### Video Demonstration
-![Video Demo!](IMG_6777.mov "Video")
+Video Demo: https://youtube.com/shorts/W2a5v1ok4oA?feature=share 
+
 
