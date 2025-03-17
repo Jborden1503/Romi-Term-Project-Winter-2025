@@ -32,7 +32,7 @@ For its attempts to complete the course, Romi had the help of a number of sensor
 <a id="physical-design"></a>
 ### Physical Design
 In order to accomodate the large size of our Line sensor, two additional brackets were 3D printed.
-![IR_ARM!](ROMI_IR_arm.jpg "Romi IR Arm")
+![IR_ARM!](ROMI_IR_arm.png "Romi IR Arm")
 ###### Figure 2. Manufactured IR sensor Brace.
 
 
