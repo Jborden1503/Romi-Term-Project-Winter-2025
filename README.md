@@ -54,7 +54,7 @@ A diagram showing the wiring connections between components.
 <a id="program-design-and-structure"></a>
 ## Program Design and Structure
 
-![Game Track!](/assets/images/Game_Track-1.jpg "Game Track With States")
+![Game Track!](Game_Track-1.jpg "Game Track With States")
 ###### Figure 3. Game track showing location of states. 
 
 <a id="tasks"></a>
