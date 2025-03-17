@@ -20,6 +20,8 @@ Project by Jake Borden and Ashford Connor
 ## Project Description
 The Romi robot is based on the ‘Romi’ chassis and motor kit from Pololu robotics. This platform includes a plastic chassis, power distribution board, 2 gearbox and motor combinations, two drive wheels and two caster wheels. Romi is capable of differential, forward and reverse driving, but is incapable of holonomic motion.  Other required hardware includes a pair of encoders, an STM 32L476RG Nucleo board and the proprietary Cal Poly made Shoe of Brian. This constructs a basic ground vehicle capable of driving until the 6 NiMh batteries lose charge, controllable using only encoder feedback. To perform more complicated functions within the scope of this project we added the following sensors and hardware: a 9DOF IMU, 8 x 13 IR reflectance sensor array, and voltage divider circuit. A summary table of all hardware and sensors used can be found below in Table 1.
 
+The robot was tasked with completed the course shown below in Figure 3. There were several different approaches used to complete this course. What follows is our approach to solving this problem, complete with our successes, failures, insights and future steps for improving our Romi. 
+
 <a id="hardware-design"></a>
 ## Hardware Design
 For its attempts to complete the course, Romi had the help of a number of sensors. First, an Adafruit BNO055 IMU was used to keep track of headings. This was connected to the Nucleo using I2C connection. Second, a pair of Pololu bump sensors were used for detecting the wall at the end of the course. Third, a Pololu analog IR reflectance sensor was used for line following. We purchased a sensor with a total of 13 channels, but only ended up using 7 of them for simplicity.
