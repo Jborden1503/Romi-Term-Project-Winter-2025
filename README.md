@@ -54,8 +54,7 @@ CAD
 
 <a id="wiring-diagram"></a>
 ### Wiring Diagram
-A diagram showing the wiring connections between components.
-
+![Pinout!](Screenshot_2025-03-16_224033.jpg "Pinout")
 <a id="program-design-and-structure"></a>
 ## Program Design and Structure
 
