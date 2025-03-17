@@ -31,7 +31,8 @@ For its attempts to complete the course, Romi had the help of a number of sensor
 
 <a id="physical-design"></a>
 ### Physical Design
-CAD
+In order to accomodate the large size of our Line sensor, two additional brackets were 3D printed.
+![IR_ARM!](ROMI_IR_arm.jpg "Romi IR Arm")
 
 <a id="bill-of-materials"></a>
 ### Bill of Materials
