@@ -33,6 +33,8 @@ For its attempts to complete the course, Romi had the help of a number of sensor
 ### Physical Design
 In order to accomodate the large size of our Line sensor, two additional brackets were 3D printed.
 ![IR_ARM!](ROMI_IR_arm.jpg "Romi IR Arm")
+###### Figure 2. Manufactured IR sensor Brace.
+
 
 <a id="bill-of-materials"></a>
 ### Bill of Materials
@@ -65,7 +67,7 @@ In order to accomodate the large size of our Line sensor, two additional bracket
 <a id="tasks"></a>
 ### Tasks
 ![ Taskdia!](Untitled_drawing.jpg "Tasking diagram")
-
+###### Figure 4. Task Diagram.
 #### Sensor Task
 
 The sensor task is responsible for reading sensor values and keeping track of significant milestones on the course. This task is functionally similar to a mastermind task, but it differs chiefly by its direct interaction with external hardware. Given the simple nature of checking course progress, it was appropriate to roll this function into the sensor task to improve memory consumption. This task is run with a priority of 2 and a period of 10 ms.
@@ -81,8 +83,9 @@ There are **12 states** in the sensor task. The transitions are determined using
 The initialization of this task is done inside a run-once `if` statement above the while loop of the main generator function. This looks for a global variable called `sensor_init`, which the main function sets to `True` before starting the scheduler. Once init functions are complete, `sensor_init` is set to `False` so that the init functions will not run again. A more elegant and Pythonic implementation of this code would be to implement the task as a class, where the init functions are performed automatically upon instantiation of a sensor task object.
 
 ##### State Descriptions
-
-- **STATE_1**: Line following through the course until checkpoint #4. The sensor task computes the centroid from the IR line sensor and sends it to the motor task via the centroid share. This state also keeps track of the encoder position looking for an encoder reading of 112 to 113 radians. Once this value is reached, the state zeroes the encoder, sets `sensor_state` to `STATE_2`, and puts a 1 in the checkpoint share. Radians were used for the distance in this state, as they proved to be more consistent in testing than a setpoint in millimeters.
+![Sensor States!](Sensor_FSM.JPG "Sensor Fsm")
+###### Figure 5. Sensor FSM.
+- **STATE_1**: Line following through the course until checkpoint #4. The sensor task computes the centroid from the IR line sensor and sends it to the motor task via the centroid share. 
 
 - **STATE_2**: Changing the heading of Romi at checkpoint #4. The state reads the raw angle heading, tests it against the desired heading of 180 degrees (with respect to the starting angle), computes the bi-directional angle, and puts it in the heading share. Once the raw angle falls within the desired range, the encoder will be zeroed, a 1 will be put in the checkpoint share, and `sensor_state` is set to `STATE_3`.
 
@@ -117,7 +120,8 @@ The task is implemented as a state machine with twelve distinct states, and tran
 
 ##### State Descriptions
 
-
+![Motor States!](Motor_FSM.JPG "Motor Fsm")
+###### Figure 6. Motor FSM.
 **STATE_1:**  Romi performs line following along the course until it reaches checkpoint #4. In this state, a PID controller processes the centroid value from the IR sensor and computes an actuation value. The computed output is used to adjust the base duty cycle: the left motor receives a command that is the base speed decreased by the corrected PID output, while the right motor receives a command that is the base speed increased by the same corrected value. When the checkpoint share is set to `1`, the system transitions to `STATE_2`.
 
 **STATE_2:** Romi is required to stop and turn in place at checkpoint #4. At the start of this state, both motor efforts are set to zero. A heading PID controller then takes the heading value from the heading share, computes an actuation value, and this value is adjusted for battery charge by the compensator. The left motor is driven with the negative of this corrected output, while the right motor receives the raw corrected output. A checkpoint signal of `1` prompts a transition to `STATE_3`.
